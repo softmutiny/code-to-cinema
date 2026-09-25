@@ -5,7 +5,8 @@
 //            state(q, p) -> st,              q = pose inside the shot, p = global pose; keep values stepped (use key())
 //            draw(S, st),                   S = the shot's <g>; build DOM with el / g / frag
 //            joint?(st) -> string,          when it changes between two poses, a 'clack' is scheduled (amp: st.snap ? 1.4 : 1)
-//            sounds?(a, b, t) -> [events],  a = this pose's state, b = the previous pose's state in the same shot, t = seconds
+//            sounds?(a, b, t) -> [events],  a = this pose's state, b = the previous pose's state (b === a on the shot's first pose), t = seconds
+//            snap: return st.snap = true from state() on a pose to make its clack louder
 //            fade?(st) -> 0..1 } ]          extra dim to black at the end
 const NP = Math.round(FILM.dur * PFPS);
 const shotOfPose = (p) => { for (const s of SHOTS) if (p >= Math.round(s.t0 * PFPS) && p < Math.round(s.t1 * PFPS)) return s; return null; };
@@ -52,11 +53,12 @@ window.renderPose = (p) => {
 window.NPOSES = NP;
 window.preloadFonts = async () => {
   const zh = FILM.text || '';
+  const lat = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.,:;!?·—–…\'"()[]/&%+-×Nº№°℃#' + zh;   // FILM.text may add symbols
   await document.fonts.ready;
   await Promise.all([
-    document.fonts.load('44px "IBM Plex Mono"', 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.,·—Nº'),
-    document.fonts.load('500 44px "IBM Plex Mono"', 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.'),
-    document.fonts.load('italic 600 46px "Cormorant Garamond"', 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.,—\''),
+    document.fonts.load('44px "IBM Plex Mono"', lat),
+    document.fonts.load('500 44px "IBM Plex Mono"', lat),
+    document.fonts.load('italic 600 46px "Cormorant Garamond"', lat),
     document.fonts.load('italic 500 18px "Cormorant Garamond"', 'abcdefghijklmnopqrstuvwxyz'),
     document.fonts.load('250px "Archivo Black"', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
     document.fonts.load('500 26px "Noto Serif SC"', zh || '醒'),
@@ -69,10 +71,10 @@ window.timeline = () => {
     const a = state(p), b = p > 0 ? state(p - 1) : null, t = p * dt;
     if (!a) continue;
     if (a.black) { ev.push({ t, type: 'pop' }); continue; }
-    if (b && a.shot !== b.shot) { ev.push({ t, type: 'cut' }); continue; }
-    if (!b || b.black) continue;
-    if (a.joint && a.joint !== b.joint) ev.push({ t, type: 'clack', amp: a.snap ? 1.4 : 1 });
-    if (a.shot.sounds) ev.push(...a.shot.sounds(a, b, t));
+    const first = !b || a.shot !== b.shot;
+    if (first && p > 0) ev.push({ t, type: 'cut' });
+    if (!first && a.joint && a.joint !== b.joint) ev.push({ t, type: 'clack', amp: a.snap ? 1.4 : 1 });
+    if (a.shot.sounds) ev.push(...a.shot.sounds(a, first ? a : b, t));   // on a shot's first pose, b === a (so diffs are empty)
   }
   return {
     duration: FILM.dur, fps: PFPS, act: new Array(NP).fill(0),

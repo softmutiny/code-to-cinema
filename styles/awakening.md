@@ -34,7 +34,7 @@ SHOTS.push({
   state(q, p) { return { rise: key(q, [[0, -300], [8, -250], [10, -205]]) }; },  // q = pose in shot
   joint: (st) => st.rise + '',       // when this string changes, a wooden 'clack' is scheduled
   draw(S, st) { paperBg(S); hand(g(S, { transform: `translate(800 700) translate(0 ${-st.rise})` }), [0.9, 0.9, 0.9, 0.9, 0.9]); },
-  sounds: (a, b, t) => a.crack > b.crack ? [{ t, type: 'crack' }] : [],   // a = this pose, b = previous pose
+  sounds: (a, b, t) => a.crack > b.crack ? [{ t, type: 'crack' }] : [],   // a = this pose, b = previous pose (b === a on the shot's first pose)
   fade: (st) => 0,                   // extra fade to black (the last shot)
 });
 ```
@@ -43,20 +43,35 @@ SHOTS.push({
 - **The last pose of every shot is black** (a "pop" on the soundtrack), except the final shot. Set `pop: false` to cut straight through.
 - **Re-seed on purpose:** `rnd = mk(seed)` before drawing anything random that must stay put (hair, stones, soil layers). Use `mk(st.p * k)` for things that should boil every pose (falling dirt, rain, dust).
 - **The post pass runs for you:** paper grain re-rolls each pose, the pencil displacement boils on a 4-pose loop, gate weave is ±2 px, and there's dust, hairs, scratches, a vignette and projector flicker.
-- `FILM.text` must list every Chinese glyph you use, so the font gets preloaded.
+- **List every Chinese glyph and unusual symbol in `FILM.text`** (℃, №, …) so they are preloaded. A glyph that isn't preloaded doesn't break the film; it just may render in a fallback font, so check captions at full size.
+- **`snap`:** return `snap: true` from `state()` on one pose to make that pose's clack louder (the "exclamation" pose).
+- **Fields main.js adds to `st`** before `draw()` runs: `st.p` (global pose), `st.q` (pose in shot), `st.shot` (the shot object), `st.black` (true on the black pop pose; `draw` isn't called then), `st.joint` (the joint string).
+- **Canvas:** 1600×900 SVG units. The post pass shifts the frame by up to ±2 px (gate weave), so `paperBg` and full-bleed backgrounds cover −20…1620 × −20…920. Do the same for your own full-bleed shapes, or a hairline edge shows.
+- **Multi-file projects are concatenated into one scope.** Top-level `const`/`function` names must be unique across all your files and must not reuse library names (`card`, `gear`, `hand`, `rain`…).
+
+## Drawing a new subject in this style
+
+The library's figures are only examples. Most films need a subject of their own, and the first attempt usually comes out as clean vector art. What makes it read as *drawn*:
+
+1. **Pencil on everything.** Wrap all line art in `g(S, { filter: 'url(#pencil)' })`. Outlines are `INK` at 1.2–2 px, never pure black.
+2. **Paint, then shade.** Fill the shape with its colour, then lay the same path again filled with a pattern: `fill: 'url(#hatch)'` (or `hatch2`, `xhatch`, `dots`) at **0.6–0.9 opacity** for shadowed parts and 0.3–0.5 for mid-tones. Low opacities disappear.
+3. **Wash the big shapes.** Backgrounds, skies and big masses go inside `g(S, { filter: 'url(#wash)' })` for a watercolour edge. Avoid it on small smooth shapes, where it makes a rounded "tube" look.
+4. **Imperfect geometry.** Draw with slightly irregular paths (`R()` jitter, re-seeded with `rnd = mk(seed)` so it holds still) instead of perfect circles and rectangles.
+5. **Light on paper is shown by darkening.** An ivory glow on ivory paper is invisible. Show a lamp by darkening the room around it: define your own radial gradient (transparent at the lamp, `INK` at 0.3–0.5 at the edge) with `frag(S, '<defs>…</defs>')` and lay it over the scene. The `beam` gradient is a fixed, centred version of this.
+6. **Check a full-size still** (`render.cjs my-film full <pose>`). At 640 px the pencil wobble is invisible and you'll over-trust the look.
 
 ## Library helpers (`awakening/lib.js`)
 
 - **DOM:** `el(tag, attrs, parent)`, `g(parent, attrs)`, `frag(parent, svgString)`, `key(q, keys)`, `mk(seed)`, `rnd` (reassign it), `R(a, b)`, `clamp`, `f1`.
-- **Paper and plates:** `paperBg(S, fill?)`; the `wash` and `pencil` filters (wrap line art in `g(S, { filter: 'url(#pencil)' })` so it wobbles like graphite); the patterns `hatch`, `hatch2`, `hatchH`, `xhatch`, `dots` and `damask`; the gradients `vig`, `vigDark`, `beam`, `skyG`, `groundG`, `washG`, `faceG`, `coatG`, `silver`, `brass` and `glowG`.
+- **Paper and plates:** `paperBg(S, fill?)`; the `wash` and `pencil` filters (wrap line art in `g(S, { filter: 'url(#pencil)' })` so it wobbles like graphite); the patterns `hatch`, `hatch2`, `hatchH`, `xhatch`, `dots` and `damask`; the gradients `vig`, `vigDark`, `beam`, `skyG`, `groundG`, `washG`, `faceG`, `coatG`, `silver`, `brass` and `glowG`; the blur filters `soft` and `blur3`. Define anything else yourself (see above).
 - **Growing things:** `strand(parent, vine({ x, y, a, tgt, len, g, curlAt, dir, w, sw, fill: hairFill(), frac }))` draws a tapered hair or root that curls at its tip; `frac` 0..1 is how much of it has grown. `frill(parent, cx, y, w, n, depth, fill)` is a paper ruff.
-- **Machinery:** `gear(parent, cx, cy, r, teeth, angle, fill, spokes)`, `gearPath`, `bone(parent, x, y, len, rot, s)`, `pendant(P, o)` (the bone locket that becomes a heart engine).
+- **Machinery:** `gear(parent, cx, cy, r, teeth, angle, fill, spokes)` (`angle` in degrees), `gearPath`, `bone(parent, x, y, len, rot, s)`, `pendant(P, o)` (the bone locket that becomes a heart engine).
 - **People:** keep them abstract, like dolls.
   - `ghost(parent, { tf, e, pupil, look, focus, tilt, halo, stage, gear, puffs, pscale })` is the long-haired doll face. `e` 0..1 opens the eyes, `stage` 0..3 grows the locket, and `puffs` are steam clouds.
   - `hand(parent, curl[5])` is a hand rising palm-out; `curl` is per finger, from 0 (straight) to 1 (fist).
   - `figure(parent, { tf, arm, up })` is a standing figure; `arm` is the arm angle in degrees.
 - **Places:** `skyline(S, dy, q)` (factory chimneys rising), `ruins(S, flash)` (a storm with a lightning flash), `rain(S, seed, n, far)` (draw one far layer behind and one near layer in front of the subject).
-- **Text:** `card(parent, x, y, [en lines], [zh lines], { en: linesShown, zh: bool }, rot, { en: size, zh: size })` is a tilted paper caption card that grows one line at a time. Classes: `serif` (Cormorant), `mono` (Plex Mono), `black` (Archivo Black, for slam titles), `zh` (Noto Serif SC).
+- **Text:** `card(parent, x, y, [en lines], [zh lines], { en: linesShown, zh: bool }, rot, { en: size, zh: size })` is a tilted paper caption card that grows one **whole line** at a time. To type a line letter by letter, pass sliced strings yourself (`[line.slice(0, n)]`), and keep the full line on the card's widest pose in mind, since the card sizes itself to its text. Classes: `serif` (Cormorant), `mono` (Plex Mono), `black` (Archivo Black, for slam titles), `zh` (Noto Serif SC).
 
 ## Motion vocabulary
 
@@ -66,6 +81,8 @@ SHOTS.push({
 - **Rising:** crack (4 steps), hole, then the subject rising in uneven jumps while tilting left and right, with dirt falling and the fingers uncurling one by one.
 - **Waking:** eyelids in 3 steps, pupils shrinking as they focus, then one **snap** pose where the head tilts and a halo appears (the `snap` flag makes that clack louder).
 - **Transformation:** a thing becomes a machine in stages (`stage` 0 → 3). Gears tick 15° per pose and steam puffs rise and fade.
+- **Cycles at 8 poses per second:** wings, flames and flicker alternate between 2–3 drawn states, switching every 1–2 poses (`[a, b, c][Math.floor(st.p / 2) % 3]`). Faster than every pose strobes; smooth sine motion looks like vector animation.
+- **Props are yours to draw.** The library covers the reference film's subjects only (hands, dolls, gears, roots). A lamp, a moth or a chair is drawn with the recipe in *Drawing a new subject* above.
 - **Slam ending:** a paper overlay, a giant two-line title in `black` wine with a lilac offset shadow, a 1.32× scale pose, then a 5-pose shake settling to zero, a credit line and a fade.
 
 ## Sound (`engine/awakening/audio.cjs`)

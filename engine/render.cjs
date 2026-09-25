@@ -1,4 +1,5 @@
 // usage: node render.cjs <projectDir> check 0,12,30   -> <projectDir>/check/check-<pose>.jpg (640px wide, for reviewing)
+//        node render.cjs <projectDir> full 40,72       -> <projectDir>/check/full-<pose>.jpg (1600×900, for crops and fine detail)
 //        node render.cjs <projectDir> all [from] [to] -> <projectDir>/frames/p0000.jpg ... (1600×900)
 //        node render.cjs <projectDir> timeline        -> <projectDir>/timeline.json (feeds audio.cjs)
 // Needs Playwright: `npm i playwright && npx playwright install chromium`.
@@ -12,9 +13,9 @@ function loadPW() {
 (async () => {
   const dir = path.resolve(process.argv[2] || '.'), mode = process.argv[3] || 'check';
   const { chromium } = loadPW();
-  const check = mode === 'check';
+  const full = mode === 'full', check = mode === 'check' || full;
   const browser = await chromium.launch(process.env.CHROME_PATH ? { executablePath: process.env.CHROME_PATH } : {});
-  const page = await browser.newPage({ viewport: { width: 1600, height: 900 }, deviceScaleFactor: check ? 0.4 : 1 });
+  const page = await browser.newPage({ viewport: { width: 1600, height: 900 }, deviceScaleFactor: check && !full ? 0.4 : 1 });
   page.on('pageerror', e => console.error('PAGE ERROR', e.message));
   page.on('console', m => { if (m.type() === 'error') console.error('CONSOLE', m.text()); });
   await page.goto('file:///' + path.join(dir, 'film.html').replace(/\\/g, '/'));
@@ -31,9 +32,9 @@ function loadPW() {
     const poses = list.length ? list : Array.from({ length: 8 }, (_, i) => Math.round(i * (n - 1) / 7));
     for (const p of poses) {
       await page.evaluate(p => window.renderPose(p), p);
-      await page.locator('#art').screenshot({ path: path.join(dir, 'check', `check-${p}.jpg`), type: 'jpeg', quality: 80 });
+      await page.locator('#art').screenshot({ path: path.join(dir, 'check', `${full ? 'full' : 'check'}-${p}.jpg`), type: 'jpeg', quality: 80 });
     }
-    console.log('checked poses', poses.join(','), 'of', n, '(pose = t × 8)');
+    console.log('checked poses', poses.join(','), 'of', n, '(pose = seconds × 8; the last pose of a shot is often a black cut pose)');
   } else {
     fs.mkdirSync(path.join(dir, 'frames'), { recursive: true });
     const n = await page.evaluate(() => window.NPOSES);

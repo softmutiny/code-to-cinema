@@ -4,6 +4,53 @@ Gustave Doré's *Divine Comedy* plates redrawn live: black ink cut into old pape
 
 Reference film: **INDEX INFERNO** (58 s, 9 shots). A descent through "circles" of lost AI models, then a climb out to the stars.
 
+## Shot API
+
+```js
+const FILM = { title: 'Index Inferno', dur: 58, labels: ['PORTA', 'CIRCVLVS I', …], finale: true };
+const SHOTS = [];
+SHOTS.push({
+  id: 0, t0: 0, t1: 5,               // seconds; shots must tile [0, dur)
+  dark: false,                        // true = scratchboard shot (light lines on black; pass col: CHALK to Plates and put a dark rect in `under`)
+  cap: [{ a: 0.9, b: 5, en: 'ABANDON ALL CONTEXT…', zh: '入此门者……' }],   // times are local to the shot
+  build() { /* build Plates once, store on this */ },
+  frame(t) { return { svg, tip, cam?, zoom?, zc?, under? }; },           // t is local; called for every pose
+  events() { return [{ t: 3.05, type: 'lamp' }]; },                      // optional sound one-shots, local time
+  overlay(t) { return '<svg over the frame border>'; },                  // optional
+  blackAt(t) { return false; },                                          // optional extra black flashes
+});
+```
+
+### Plate: the drawing that writes itself
+
+```js
+const P = new Plate(seed, { col: INK, win: [[0,.55],[.22,.72],[.4,.86],[.55,.96],[.66,1],[.3,.9]] });
+P.keyFn = (x, y) => x;                        // drawing order within a layer (here: left → right)
+P.tone((x, y) => 0..1, { angs, sp, wave, w, con, bb });   // engraved shading: 3 crossing hatch layers (1,2,3), darker = more layers
+P.hatch(toneFn, thr, angle, spacing, { layer, bb, wmin, wmax, wave });   // one hatch set, full control
+P.line(pts, { w, key, layer, wob, op, col });   // pen contour (layer 0, wobbled by default)
+P.poly(pts, o); P.fill(pts, color, o); P.dots(toneFn, n, bb, o); P.text(x, y, str, o); P.raw(svg, o);
+const { svg, tip } = P.render(progress0to1);  // tip = [x, y, angle] of the newest stroke → return it so the nib is drawn
+```
+- `win[layer] = [start, end]` is when that layer draws inside the plate's progress. Contours (0) come first and hatching layers overlap after them, which reads as "sketch, then shade".
+- **`tone` options:** `angs` = the three hatch angles in radians (layer 1, 2, 3); `sp` = line spacing in px; `wave` = how much each line undulates; `w` = line-width multiplier; `con` = contrast applied to your tone values around 0.5; `bb` = `[x0, y0, x1, y1]` area to fill (defaults to the canvas; set it, it's faster).
+- `key` / `keyFn` sets the order within a layer: **smaller keys draw first.** `keyFn(x, y)` is called with each stroke's midpoint; a per-item `key` overrides it. Sweep in a readable direction (left→right, top→down, outward from the subject).
+- **Think in tone functions.** `tone(x, y)` returns 0 for paper white and 1 for the deepest black. Build it from shapes (`pip`, `ell`, `segDist`, `capU`) plus `fbm` noise and `sm` falloffs. Return 0 inside anything that must stay clean (faces of light, the moon, text areas).
+- Helpers in `engine/core.js`: `mk(seed)` rng, `fbm`/`vnoise`, `sm`, `clamp`, `lerp`, `ellPts`, `bez`, `spline`, `capsule`, `bbox`, `tf(x, y, s, r)` transform string, `nib()`, `lanternPlate()`, `lanternGlow()`.
+- Compose plates by rendering several and wrapping each in `<g transform="${tf(x, y, s)}">`. To animate a thing, re-render it with a transform per frame, or step its position on 8 fps ticks for the hand-drawn feel.
+- Camera: return `cam` (vertical pan in px) or `zoom` + `zc` (centre). Keep moves slow and small.
+
+### Plate gotchas
+
+- **Fills always sit under lines within one Plate.** `render()` outputs fills, then strokes, then text; `layer` only changes *when* a fill appears. To cover lines (a bucket in front of a wall), put the covering object in its own Plate rendered later.
+- **Fills are slightly translucent** (the `pen` filter mottles the ink). On a dark ground, fill twice or add an opaque shape underneath.
+- **Order hatching left→right or top→down.** The order key is each stroke's midpoint, and a hatch stroke can span the whole plate, so "distance from the subject" orders sweep in odd diagonal bands. Use subject-first ordering for contours (layer 0), not for hatching.
+- **Tone helpers** (`engine/core.js`): `ell(x, y, cx, cy, rx, ry)` returns < 1 inside the ellipse; `pip(x, y, poly)` tests a point in a polygon; `segDist(x, y, a, b)`; `capU(x, y, a, b, r)` gives 0..1 across a limb or -1 outside; `capsule(a, b, r, r2?)` returns limb outline points; `fbm(x, y, seed)`, `sm(a, b, x)`.
+- **Defs in `engine/head.html`:** filters `pen`, `bleed`, `soft`, `grain`, `paper`; radial gradients `glow` (lamp), `core` (a hot centre for any light, not only a flame), `star`, `vig`. `lanternGlow` always draws a flame, so for light without one (water, a window, a halo) use `<circle fill="url(#core)">` or your own gradient.
+- **A moving subject needs its own paper.** Tone white-space is baked into the background plate, so a boat or figure that moves over a dark area disappears into the hatching. Give the moving thing a `P.fill(outline, PAPER)` in its own Plate (rendered after the background) and shade it with its own tone.
+- **Soft edges on white-space.** A rectangle carved out of `toneFn` (`if (inBox) return 0`) shows a hard, ruled edge. Carve with an ellipse and a falloff instead: `t *= sm(0.7, 1.1, ell(x, y, cx, cy, rx, ry))`.
+- **Flat, even hatching looks mechanical.** Vary tone inside every surface with `fbm`, darken toward edges and away from the light, and let the three layers only cross in the real darks.
+
 ## Palette (constants in `engine/core.js`)
 
 | name | hex | use |

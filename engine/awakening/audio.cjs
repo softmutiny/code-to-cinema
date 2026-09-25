@@ -8,6 +8,7 @@ const fs = require('fs');
 const path = require('path');
 const DIR = path.resolve(process.argv[2] || '.');
 const tl = JSON.parse(fs.readFileSync(path.join(DIR, 'timeline.json'), 'utf8'));
+{ const known = new Set([...fs.readFileSync(__filename, 'utf8').matchAll(/case '(\w+)'/g)].map(m => m[1])), bad = [...new Set(tl.events.map(e => e.type).filter(t => !known.has(t)))]; if (bad.length) console.warn('unknown sound event(s), they will be silent:', bad.join(', ')); }
 const SR = 48000, DUR = tl.duration + 0.4, N = Math.ceil(DUR * SR);
 const L = new Float32Array(N), Rt = new Float32Array(N);
 let seed = 12345;

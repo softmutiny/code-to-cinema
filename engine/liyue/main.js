@@ -21,7 +21,7 @@ function caption(s, lt) {
     zh.forEach((ch, i) => {
       const e = clamp((u - i / rate) / 0.32); if (e <= 0) return;
       const dy = (1 - ease(e)) * 6;
-      o += `<text class="zh" x="${f(x0 + i * cw)}" y="${f(y + dy)}" font-size="${size}" text-anchor="middle" fill="${colZ}" opacity="${ease(e).toFixed(3)}">${esc(ch)}</text>`;
+      o += `<text class="zh" x="${f(x0 + i * cw)}" y="${f(y + dy)}" font-size="${size}" text-anchor="middle" fill="${colZ}" opacity="${ease(e).toFixed(3)}"${BOXED.has(ch) ? ` style="font-family:'Noto Serif SC',serif"` : ""}>${esc(ch)}</text>`;
     });
     if (c.en) { const e = ease((u - n / rate - 0.15) / 0.6); if (e > 0) o += `<text class="cg" font-style="italic" font-weight="500" x="800" y="${y + 40}" font-size="${c.enSize || 22}" letter-spacing="1" text-anchor="middle" fill="${colE}" opacity="${e.toFixed(3)}">${esc(c.en)}</text>`; }
     o += `</g>`;
@@ -66,6 +66,7 @@ function renderPose(p) {
   root.innerHTML = out;
   return { tip: !!cur.fr.tip };
 }
+const BOXED = new Set();
 window.renderPose = renderPose;
 window.NPOSES = NP;
 window.preloadFonts = async () => {
@@ -76,9 +77,19 @@ window.preloadFonts = async () => {
   await Promise.all([
     document.fonts.load('46px "ZCOOL XiaoWei"', zh.join('') + (FILM.text || '') || '月'),
     document.fonts.load('italic 500 22px "Cormorant Garamond"', en.join('') || 'A'),
-    document.fonts.load('500 13px "Noto Serif SC"', FILM.title + (FILM.labels || []).join('') + (FILM.text || '')),
+    document.fonts.load('500 13px "Noto Serif SC"', FILM.title + (FILM.labels || []).join('') + (FILM.text || '') + zh.join('')),
     document.fonts.load('500 12px "Cinzel"', 'MID AUTUMN · 0123456789'),
   ]);
+  // ZCOOL XiaoWei draws a few glyphs (e.g. 回) as a solid box; find them and let captions use Noto Serif SC instead
+  const cv = document.createElement('canvas'); cv.width = cv.height = 80; const cx = cv.getContext('2d', { willReadFrequently: true });
+  for (const ch of new Set([...zh.join(''), ...(FILM.text || '')])) {
+    if (!/[㐀-鿿]/.test(ch)) continue;
+    cx.clearRect(0, 0, 80, 80); cx.font = '64px "ZCOOL XiaoWei"'; cx.textBaseline = 'middle'; cx.textAlign = 'center'; cx.fillText(ch, 40, 42);
+    const d = cx.getImageData(0, 0, 80, 80).data; let x0 = 80, y0 = 80, x1 = -1, y1 = -1, ink = 0;
+    for (let i = 0; i < 6400; i++) if (d[i * 4 + 3] > 128) { const x = i % 80, y = (i / 80) | 0; ink++; x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); }
+    if (x1 > x0 && ink / ((x1 - x0 + 1) * (y1 - y0 + 1)) > 0.8) BOXED.add(ch);
+  }
+  if (BOXED.size) console.warn('ZCOOL XiaoWei has no real glyph for', [...BOXED].join(''), '- captions use Noto Serif SC for these; avoid them in class="zh" plate text');
   return [...new Set([...document.fonts].filter(x => x.status === 'loaded').map(x => x.family))];
 };
 // soundtrack timeline: shot bounds, wire-laying activity per pose, sound events

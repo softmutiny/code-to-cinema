@@ -9,3 +9,4 @@ tools/
 far-side/
 *.enc
 .env
+films/

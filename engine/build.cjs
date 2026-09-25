@@ -10,8 +10,11 @@ const E = (f) => fs.readFileSync(path.join(__dirname, f), 'utf8');
 const files = fs.readdirSync(dir).filter(f => f.endsWith('.js')).sort((a, b) => (a === 'shots.js' ? -1 : b === 'shots.js' ? 1 : a.localeCompare(b)));
 if (!files.length) { console.error('no .js shot files in', dir); process.exit(1); }
 const proj = files.map(f => `// ----- ${f} -----\n` + fs.readFileSync(path.join(dir, f), 'utf8')).join('\n');
-const title = (proj.match(/title\s*:\s*['"`]([^'"`]+)/) || [, 'Film'])[1];
-const style = (proj.match(/style\s*:\s*['"`](\w+)/) || [, 'engraving'])[1];
+// read title/style from the FILM object only, so a stray `style:` elsewhere can't switch drawers
+const fm = proj.search(/\bFILM\s*=\s*\{/), head = fm >= 0 ? proj.slice(fm, fm + 800) : proj;
+const title = (head.match(/title\s*:\s*['"`]([^'"`]+)/) || [, 'Film'])[1];
+const style = (head.match(/style\s*:\s*['"`](\w+)/) || [, 'engraving'])[1];
+if (style !== 'engraving' && !fs.existsSync(path.join(__dirname, style, 'main.js'))) { console.error('unknown style:', style); process.exit(1); }
 const S = style === 'engraving' ? { head: 'head.html', lib: 'core.js', main: 'main.js' } : { head: `${style}/head.html`, lib: `${style}/lib.js`, main: `${style}/main.js` };
 const html = E(S.head).replace('{{TITLE}}', title) + '\n(() => {\n' + E(S.lib) + '\n' + proj + '\n' + E(S.main) + '\n})();\n</script>\n</body>\n</html>\n';
 fs.writeFileSync(path.join(dir, 'film.html'), html);

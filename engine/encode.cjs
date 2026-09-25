@@ -18,7 +18,8 @@ const RNG = 'in_range=pc:out_range=tv';
 const scale = X ? `scale=1920:1080:flags=lanczos:${RNG},hqdn3d=1:1:2:2,` : `scale=${RNG},`;
 const a = ['-y', '-loglevel', 'error', '-framerate', String(tl.fps), '-i', path.join(dir, 'frames', 'p%04d.jpg')];
 if (hasAudio) a.push('-i', path.join(dir, 'audio.wav'));
-let vf = `${scale}fps=24,format=yuv420p`;
+// tpad holds the last pose for its full 1/fps; without it fps=24 ends the stream at the last pose's start time
+let vf = `${scale}tpad=stop_mode=clone:stop_duration=${(1 / tl.fps).toFixed(4)},fps=24,format=yuv420p`;
 if (cover != null) {
   const p = Math.round(cover * tl.fps), f = path.join(dir, 'frames', `p${String(p).padStart(4, '0')}.jpg`);
   a.push('-loop', '1', '-framerate', '24', '-t', '0.5', '-i', f);

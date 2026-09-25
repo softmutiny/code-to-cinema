@@ -10,6 +10,7 @@ const fs = require('fs');
 const path = require('path');
 const DIR = path.resolve(process.argv[2] || '.');
 const tl = JSON.parse(fs.readFileSync(path.join(DIR, 'timeline.json'), 'utf8'));
+{ const known = new Set([...fs.readFileSync(__filename, 'utf8').matchAll(/case '(\w+)'/g)].map(m => m[1]).concat(['swell'])), bad = [...new Set(tl.events.map(e => e.type).filter(t => !known.has(t)))]; if (bad.length) console.warn('unknown sound event(s), they will be silent:', bad.join(', ')); }
 const SR = 48000, DUR = tl.duration + 0.3, N = Math.ceil(DUR * SR);
 const L = new Float32Array(N), R = new Float32Array(N), S = new Float32Array(N); // S = reverb send (mono)
 let seed = 1227;
@@ -98,8 +99,19 @@ function burst(t, o) {
   const P1 = [[0, 69], [0.5, 71], [1.0, 74], [2.0, 71], [2.5, 69], [3.0, 66, 0, 1.2]];
   const P2 = [[0, 66], [0.5, 69], [1.0, 71], [1.5, 69], [2.5, 64, 2], [3.25, 62]];
   const P3 = [[0, 74], [0.75, 76], [1.5, 74, 0], [2.25, 71], [3.0, 69, 2]];
-  const plan = [[1.2, P1, 0.16], [7.6, P2, 0.14], [14.3, P1, 0.13], [17.4, P2, 0.12], [21.0, P3, 0.14],
-    [34.2, P2, 0.1], [37.6, P1, 0.12], [41.0, P3, 0.15], [44.6, P1, 0.17], [49.0, P3, 0.17], [52.4, P2, 0.14]];
+  // Where the phrases go. Put a motif.json in the project to place them yourself:
+  //   [[seconds, "P1" | "P2" | "P3", amp≈0.1–0.17], …]
+  // Otherwise one phrase starts 1.2 s into every shot with mood > 0 (a second one mid-shot for shots over 7 s), cycling P1 → P2 → P3.
+  const PH = { P1, P2, P3 }, mf = path.join(DIR, 'motif.json');
+  let plan;
+  if (fs.existsSync(mf)) plan = JSON.parse(fs.readFileSync(mf, 'utf8')).map(([t, p, a]) => [t, PH[p] || P1, a ?? 0.14]);
+  else {
+    plan = []; let k = 0;
+    shots.forEach(([t0, t1], i) => {
+      if (!(moods[i] > 0)) return;
+      for (let t = t0 + 1.2; t < t1 - 2.5; t += (t1 - t0 > 7 ? (t1 - t0) / 2 : 1e9)) plan.push([t, [P1, P2, P3][k++ % 3], 0.1 + 0.06 * Math.min(1, moods[i])]);
+    });
+  }
   for (const [t0, P, a] of plan) for (const [dt, m, bend, dec] of P) pluck(t0 + dt, m, a, (rnd() - 0.5) * 0.4, { bend: bend || 0, decay: dec ? 1.6 * dec : 1.6 });
   // a low root under each phrase
   for (const [t0, , a] of plan) { pluck(t0, 50, a * 0.8, -0.1, { decay: 2.4, vib: 0.002 }); pluck(t0 + 1.5, 57, a * 0.5, 0.1, { decay: 2.2, vib: 0.002 }); }

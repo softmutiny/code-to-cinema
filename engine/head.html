@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>{{TITLE}}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Noto+Serif+SC:wght@500;600&display=block" rel="stylesheet">
+<style>
+  html,body { margin:0; background:#000; overflow:hidden; }
+  svg { display:block; }
+  .serif { font-family:'Cormorant Garamond', Georgia, serif; }
+  .cinzel { font-family:'Cinzel', 'Trajan Pro', Georgia, serif; }
+  .zh { font-family:'Noto Serif SC', 'Yu Mincho', 'SimSun', serif; }
+</style>
+</head>
+<body>
+<svg id="art" width="1600" height="900" viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- old paper: stains + fibres + foxing -->
+    <filter id="paper" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.0035" numOctaves="4" seed="7" result="stain"/>
+      <feColorMatrix in="stain" type="matrix" values="0 0 0 0 0.45  0 0 0 0 0.34  0 0 0 0 0.2  1.1 0 0 0 -0.42" result="stainC"/>
+      <feTurbulence type="fractalNoise" baseFrequency="0.015 0.6" numOctaves="2" seed="3" result="fiber"/>
+      <feColorMatrix in="fiber" type="matrix" values="0 0 0 0 0.4  0 0 0 0 0.33  0 0 0 0 0.25  0.55 0 0 0 -0.2" result="fiberC"/>
+      <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="21" result="fox"/>
+      <feColorMatrix in="fox" type="matrix" values="0 0 0 0 0.55  0 0 0 0 0.38  0 0 0 0 0.2  2.4 0 0 0 -1.55" result="foxC"/>
+      <feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="stainC"/><feMergeNode in="fiberC"/><feMergeNode in="foxC"/></feMerge>
+    </filter>
+    <!-- film grain (seed re-rolled every pose so it boils) -->
+    <filter id="grain" x="0" y="0" width="100%" height="100%">
+      <feTurbulence id="grainT" type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="11" stitchTiles="stitch"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.12  0 0 0 0 0.1  0 0 0 0 0.1  1.5 0 0 0 -0.64"/>
+    </filter>
+    <filter id="grainL" x="0" y="0" width="100%" height="100%">
+      <feTurbulence id="grainLT" type="fractalNoise" baseFrequency="0.8" numOctaves="2" seed="5" stitchTiles="stitch"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.93  0 0 0 0 0.89  0 0 0 0 0.8  1.6 0 0 0 -0.72"/>
+    </filter>
+    <!-- pen: tiny displacement + ink mottling so vector lines stop looking vector -->
+    <filter id="pen" x="-2%" y="-2%" width="104%" height="104%">
+      <feTurbulence id="penT" type="fractalNoise" baseFrequency="0.06" numOctaves="2" seed="2" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="1.7" xChannelSelector="R" yChannelSelector="G" result="d"/>
+      <feTurbulence type="fractalNoise" baseFrequency="0.6" numOctaves="1" seed="9" result="n2"/>
+      <feColorMatrix in="n2" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -1.3 0 0 0 1.75" result="mot"/>
+      <feComposite in="d" in2="mot" operator="in"/>
+    </filter>
+    <filter id="bleed" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.09" numOctaves="3" seed="4" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="7" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="5"/></filter>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#f6cf78" stop-opacity="0.95"/><stop offset="0.25" stop-color="#e8b04a" stop-opacity="0.55"/><stop offset="0.6" stop-color="#e8b04a" stop-opacity="0.16"/><stop offset="1" stop-color="#e8b04a" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="core" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#fff6dc" stop-opacity="1"/><stop offset="0.5" stop-color="#f7d58a" stop-opacity="0.8"/><stop offset="1" stop-color="#e8b04a" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="star" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#fffaf0" stop-opacity="1"/><stop offset="0.3" stop-color="#fff1d6" stop-opacity="0.75"/><stop offset="1" stop-color="#ffe9c4" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="vig" cx="0.5" cy="0.46" r="0.75">
+      <stop offset="0.55" stop-color="#3a2a1e" stop-opacity="0"/><stop offset="1" stop-color="#2a1d14" stop-opacity="0.5"/>
+    </radialGradient>
+    <clipPath id="plateClip"><rect x="70" y="44" width="1460" height="672"/></clipPath>
+  </defs>
+  <rect width="1600" height="900" fill="#e8dfcc"/>
+  <rect width="1600" height="900" fill="#e8dfcc" filter="url(#paper)"/>
+  <g id="root"></g>
+</svg>
+<script>

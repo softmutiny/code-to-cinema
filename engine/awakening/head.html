@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>{{TITLE}}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=IBM+Plex+Mono:wght@400;500&family=Noto+Serif+SC:wght@500;600&display=block" rel="stylesheet">
+<style>
+  html,body { margin:0; background:#000; overflow:hidden; }
+  svg { display:block; }
+  .serif { font-family:'Cormorant Garamond', Georgia, serif; }
+  .mono  { font-family:'IBM Plex Mono', Consolas, monospace; }
+  .black { font-family:'Archivo Black', 'Arial Black', Impact, sans-serif; }
+  .zh    { font-family:'Noto Serif SC', 'SimSun', serif; }
+</style>
+</head>
+<body>
+<svg id="art" width="1600" height="900" viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="paper" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.004" numOctaves="3" seed="7" result="stain"/>
+      <feColorMatrix in="stain" type="matrix" values="0 0 0 0 0.42  0 0 0 0 0.33  0 0 0 0 0.25  0.9 0 0 0 -0.32" result="stainC"/>
+      <feTurbulence type="fractalNoise" baseFrequency="0.02 0.55" numOctaves="2" seed="3" result="fiber"/>
+      <feColorMatrix in="fiber" type="matrix" values="0 0 0 0 0.35  0 0 0 0 0.3  0 0 0 0 0.28  0.5 0 0 0 -0.18" result="fiberC"/>
+      <feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="stainC"/><feMergeNode in="fiberC"/></feMerge>
+    </filter>
+    <filter id="grain" x="0" y="0" width="100%" height="100%">
+      <feTurbulence id="grainT" type="fractalNoise" baseFrequency="0.95" numOctaves="2" seed="11" stitchTiles="stitch"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.16  0 0 0 0 0.12  0 0 0 0 0.14  1.5 0 0 0 -0.62"/>
+    </filter>
+    <filter id="grainL" x="0" y="0" width="100%" height="100%">
+      <feTurbulence id="grainLT" type="fractalNoise" baseFrequency="0.8" numOctaves="2" seed="5" stitchTiles="stitch"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.93  0 0 0 0 0.89  0 0 0 0 0.82  1.6 0 0 0 -0.7"/>
+    </filter>
+    <filter id="wash" x="-20%" y="-20%" width="140%" height="140%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="4" seed="5" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="46" xChannelSelector="R" yChannelSelector="G" result="d"/>
+      <feGaussianBlur in="d" stdDeviation="2.2" result="b"/>
+      <feTurbulence type="fractalNoise" baseFrequency="0.011" numOctaves="3" seed="9" result="n2"/>
+      <feColorMatrix in="n2" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -0.9 0 0 0 1.12" result="mottle"/>
+      <feComposite in="b" in2="mottle" operator="in"/>
+    </filter>
+    <filter id="pencil" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence id="pencilT" type="fractalNoise" baseFrequency="0.9" numOctaves="1" seed="2" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="1.8" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <filter id="steam" x="-60%" y="-60%" width="220%" height="220%">
+      <feTurbulence id="steamT" type="fractalNoise" baseFrequency="0.07" numOctaves="2" seed="4" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="9" xChannelSelector="R" yChannelSelector="G" result="d"/>
+      <feGaussianBlur in="d" stdDeviation="0.8"/>
+    </filter>
+    <filter id="soft"><feGaussianBlur stdDeviation="6"/></filter>
+    <filter id="blur3" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"/></filter>
+
+    <pattern id="hatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(38)">
+      <line x1="0" y1="0" x2="0" y2="5" stroke="#2b2226" stroke-width="0.7" opacity="0.55"/>
+    </pattern>
+    <pattern id="hatch2" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(-24)">
+      <line x1="0" y1="0" x2="0" y2="4" stroke="#1b1417" stroke-width="0.6" opacity="0.55"/>
+    </pattern>
+    <pattern id="hatchH" width="6" height="3.2" patternUnits="userSpaceOnUse" patternTransform="rotate(4)">
+      <line x1="0" y1="0" x2="6" y2="0" stroke="#1b1417" stroke-width="0.6" opacity="0.5"/>
+    </pattern>
+    <pattern id="xhatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(-52)">
+      <line x1="0" y1="0" x2="0" y2="6" stroke="#2b2226" stroke-width="0.6" opacity="0.45"/>
+    </pattern>
+    <pattern id="dots" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(15)">
+      <circle cx="3" cy="3" r="1.05" fill="#2b2226" opacity="0.5"/>
+    </pattern>
+    <pattern id="damask" width="26" height="30" patternUnits="userSpaceOnUse">
+      <rect width="26" height="30" fill="#4a1c25"/>
+      <path d="M13 4 C16 9 20 10 22 15 C20 20 16 21 13 26 C10 21 6 20 4 15 C6 10 10 9 13 4 Z" fill="#7d2d3a" opacity="0.9"/>
+      <circle cx="13" cy="15" r="2.2" fill="#b98a6e" opacity="0.55"/>
+      <path d="M0 0 L3 3 M26 0 L23 3 M0 30 L3 27 M26 30 L23 27" stroke="#7d2d3a" stroke-width="1"/>
+    </pattern>
+
+    <radialGradient id="faceG" cx="0.45" cy="0.42" r="0.65">
+      <stop offset="0" stop-color="#f4eee6"/><stop offset="0.7" stop-color="#e6ddd6"/><stop offset="1" stop-color="#c9bfc4"/>
+    </radialGradient>
+    <radialGradient id="washG" cx="0.5" cy="0.4" r="0.6">
+      <stop offset="0" stop-color="#4c4553"/><stop offset="0.55" stop-color="#6d6377"/><stop offset="1" stop-color="#8a7f93"/>
+    </radialGradient>
+    <linearGradient id="coatG" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4a3f47"/><stop offset="0.6" stop-color="#342b31"/><stop offset="1" stop-color="#4f4038"/>
+    </linearGradient>
+    <radialGradient id="silver" cx="0.35" cy="0.3" r="0.8">
+      <stop offset="0" stop-color="#f4f1ec"/><stop offset="0.5" stop-color="#a9a6a8"/><stop offset="1" stop-color="#5d5a5f"/>
+    </radialGradient>
+    <radialGradient id="brass" cx="0.35" cy="0.3" r="0.8">
+      <stop offset="0" stop-color="#efe2c4"/><stop offset="0.5" stop-color="#b09a78"/><stop offset="1" stop-color="#5e4c3a"/>
+    </radialGradient>
+    <radialGradient id="glowG" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#fff7ea" stop-opacity="0.95"/><stop offset="0.45" stop-color="#f3ede2" stop-opacity="0.5"/><stop offset="1" stop-color="#f3ede2" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="vig" cx="0.5" cy="0.48" r="0.75">
+      <stop offset="0.55" stop-color="#6b5a4e" stop-opacity="0"/><stop offset="1" stop-color="#3a2e28" stop-opacity="0.5"/>
+    </radialGradient>
+    <radialGradient id="vigDark" cx="0.5" cy="0.5" r="0.72">
+      <stop offset="0.5" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="0.7"/>
+    </radialGradient>
+    <radialGradient id="beam" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#4a3f44" stop-opacity="0.9"/><stop offset="1" stop-color="#4a3f44" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="skyG" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2e2833"/><stop offset="0.55" stop-color="#5e5566"/><stop offset="0.8" stop-color="#7a6f7f"/><stop offset="1" stop-color="#4f4540"/>
+    </linearGradient>
+    <linearGradient id="groundG" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2b2226" stop-opacity="0"/><stop offset="1" stop-color="#1b1417" stop-opacity="0.75"/>
+    </linearGradient>
+  </defs>
+  <g id="root"></g>
+</svg>
+
+<script>

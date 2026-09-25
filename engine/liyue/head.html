@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<title>{{TITLE}}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=ZCOOL+XiaoWei&family=Cinzel:wght@500;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Noto+Serif+SC:wght@500;600&display=block" rel="stylesheet">
+<style>
+  html,body{margin:0;background:#f4eef6;overflow:hidden;}
+  svg{display:block;}
+  .zh{font-family:'ZCOOL XiaoWei','Noto Serif SC',serif;}
+  .cz{font-family:'Cinzel',Georgia,serif;}
+  .cg{font-family:'Cormorant Garamond',Georgia,serif;}
+  .ns{font-family:'Noto Serif SC',serif;}
+</style>
+</head>
+<body>
+<svg id="art" width="1600" height="900" viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <filter id="glow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="6"/></filter>
+  <filter id="glowS" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.5"/></filter>
+  <filter id="bloom" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="20"/></filter>
+  <filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="40"/></filter>
+  <!-- gouache / pastel-crayon grain inside the fills -->
+  <filter id="gouache" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+    <feTurbulence type="fractalNoise" baseFrequency="0.85 0.55" numOctaves="3" seed="7" result="n"/>
+    <feColorMatrix in="n" type="matrix" values="0 0 0 0 0.5  0 0 0 0 0.5  0 0 0 0 0.5  0 0 0 0 1" result="flat"/>
+    <feColorMatrix in="n" type="saturate" values="0" result="g"/>
+    <feComposite in="g" in2="SourceGraphic" operator="in" result="gi"/>
+    <feBlend in="gi" in2="SourceGraphic" mode="soft-light" result="b"/>
+    <feComposite in="b" in2="SourceGraphic" operator="in"/>
+  </filter>
+  <filter id="crayon" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+    <feTurbulence type="fractalNoise" baseFrequency="0.06 0.9" numOctaves="2" seed="11" result="n"/>
+    <feColorMatrix in="n" type="saturate" values="0" result="g"/>
+    <feComposite in="g" in2="SourceGraphic" operator="in" result="gi"/>
+    <feBlend in="gi" in2="SourceGraphic" mode="soft-light" result="b"/>
+    <feComposite in="b" in2="SourceGraphic" operator="in"/>
+  </filter>
+  <filter id="paper" x="0" y="0" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" seed="3" result="n"/>
+    <feColorMatrix in="n" type="matrix" values="0 0 0 0 0.35  0 0 0 0 0.28  0 0 0 0 0.45  1.4 0 0 0 -0.62"/>
+  </filter>
+
+  <linearGradient id="skyG" gradientUnits="userSpaceOnUse" x1="0" y1="58" x2="0" y2="765">
+    <stop offset="0" stop-color="#9ea9e6"/><stop offset="0.28" stop-color="#b6b8ee"/><stop offset="0.5" stop-color="#d3c9f2"/>
+    <stop offset="0.72" stop-color="#f1cde0"/><stop offset="0.9" stop-color="#f8d9d9"/><stop offset="1" stop-color="#fbe6d8"/>
+  </linearGradient>
+  <radialGradient id="paperG" cx="0.5" cy="0.42" r="0.75">
+    <stop offset="0" stop-color="#fcf7f0"/><stop offset="0.7" stop-color="#f3eaf3"/><stop offset="1" stop-color="#e6ddf0"/>
+  </radialGradient>
+  <radialGradient id="moonG" cx="0.42" cy="0.38" r="0.72">
+    <stop offset="0" stop-color="#fffdea"/><stop offset="0.5" stop-color="#fff1b8"/><stop offset="0.85" stop-color="#f9e39a"/><stop offset="1" stop-color="#f3d690"/>
+  </radialGradient>
+  <linearGradient id="goldG" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#f8e6a8"/><stop offset="0.5" stop-color="#dcb65e"/><stop offset="1" stop-color="#ad8435"/>
+  </linearGradient>
+  <linearGradient id="goldH" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#b58a3a"/><stop offset="0.45" stop-color="#f6dc92"/><stop offset="0.55" stop-color="#fff1c4"/><stop offset="1" stop-color="#b58a3a"/>
+  </linearGradient>
+  <linearGradient id="hairG" gradientUnits="userSpaceOnUse" x1="0" y1="380" x2="0" y2="720">
+    <stop offset="0" stop-color="#f9e6ae"/><stop offset="0.55" stop-color="#efcb7e"/><stop offset="1" stop-color="#e2b364"/>
+  </linearGradient>
+  <linearGradient id="pinkHairG" gradientUnits="userSpaceOnUse" x1="0" y1="480" x2="0" y2="720">
+    <stop offset="0" stop-color="#fcdbe4"/><stop offset="1" stop-color="#f0adc1"/>
+  </linearGradient>
+  <linearGradient id="robeO" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#eef6f6"/><stop offset="0.5" stop-color="#cfe6ea"/><stop offset="1" stop-color="#a9cbd9"/>
+  </linearGradient>
+  <linearGradient id="robeP" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#fdefe6"/><stop offset="1" stop-color="#f2bfcb"/>
+  </linearGradient>
+  <linearGradient id="collarG" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#fbf7ee"/><stop offset="1" stop-color="#dfd6f2"/>
+  </linearGradient>
+  <linearGradient id="piboL" gradientUnits="userSpaceOnUse" x1="300" y1="0" x2="720" y2="0">
+    <stop offset="0" stop-color="#cfc2f2" stop-opacity="0.9"/><stop offset="0.5" stop-color="#e5dcf8" stop-opacity="0.95"/><stop offset="1" stop-color="#c7e8e4" stop-opacity="0.95"/>
+  </linearGradient>
+  <linearGradient id="piboM" gradientUnits="userSpaceOnUse" x1="940" y1="0" x2="1230" y2="0">
+    <stop offset="0" stop-color="#fbd9d4" stop-opacity="0.95"/><stop offset="1" stop-color="#cfeee4" stop-opacity="0.9"/>
+  </linearGradient>
+  <linearGradient id="cloudIri" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1600" y2="0">
+    <stop offset="0" stop-color="#fdf6ee"/><stop offset="0.16" stop-color="#f4dcef"/><stop offset="0.33" stop-color="#e2dcf8"/>
+    <stop offset="0.5" stop-color="#d9eff0"/><stop offset="0.66" stop-color="#fbeedb"/><stop offset="0.82" stop-color="#ecdcf6"/><stop offset="1" stop-color="#f9e0ea"/>
+  </linearGradient>
+  <radialGradient id="puffHi" cx="0.42" cy="0.28" r="0.62">
+    <stop offset="0" stop-color="#fffdf8" stop-opacity="0.85"/><stop offset="0.6" stop-color="#fffdf8" stop-opacity="0.25"/><stop offset="1" stop-color="#fffdf8" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="puffLo" cx="0.5" cy="1" r="0.7">
+    <stop offset="0" stop-color="#b9b0e6" stop-opacity="0.45"/><stop offset="1" stop-color="#b9b0e6" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="warmBloom" cx="0.5" cy="0.5" r="0.5">
+    <stop offset="0" stop-color="#ffe7a0" stop-opacity="0.9"/><stop offset="0.5" stop-color="#ffd98a" stop-opacity="0.35"/><stop offset="1" stop-color="#ffd98a" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="kongG" cx="0.5" cy="0.62" r="0.62">
+    <stop offset="0" stop-color="#fffbe6"/><stop offset="0.35" stop-color="#ffe7a6"/><stop offset="0.8" stop-color="#f6c46e"/><stop offset="1" stop-color="#e7a85a"/>
+  </radialGradient>
+  <radialGradient id="fruitG" cx="0.4" cy="0.35" r="0.7">
+    <stop offset="0" stop-color="#fffdf0"/><stop offset="0.6" stop-color="#fdf0b0"/><stop offset="1" stop-color="#f3d98a"/>
+  </radialGradient>
+  <linearGradient id="jadeG" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#f1fbf5"/><stop offset="0.5" stop-color="#c3ead8"/><stop offset="1" stop-color="#8fcfb4"/>
+  </linearGradient>
+  <linearGradient id="roofG" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#d7f1ee"/><stop offset="1" stop-color="#86c3c0"/>
+  </linearGradient>
+  <linearGradient id="waterG" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#cfd3f4"/><stop offset="1" stop-color="#e9cfe6"/>
+  </linearGradient>
+  <linearGradient id="fanG" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#fffaf0"/><stop offset="1" stop-color="#f3e4ef"/>
+  </linearGradient>
+  <linearGradient id="cartG" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#fffaf1"/><stop offset="1" stop-color="#f3e6f1"/>
+  </linearGradient>
+<linearGradient id="skyG4" gradientUnits="userSpaceOnUse" x1="0" y1="150" x2="0" y2="624">
+  <stop offset="0" stop-color="#9ea9e6"/><stop offset="0.3" stop-color="#b6b8ee"/><stop offset="0.55" stop-color="#d3c9f2"/>
+  <stop offset="0.78" stop-color="#f1cde0"/><stop offset="1" stop-color="#fbe2da"/></linearGradient>
+<linearGradient id="skyTop" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="80"><stop offset="0" stop-color="#a3ade8"/><stop offset="1" stop-color="#c9c3f0"/></linearGradient>
+<linearGradient id="winSky" gradientUnits="userSpaceOnUse" x1="0" y1="176" x2="0" y2="650"><stop offset="0" stop-color="#b3b9ee"/><stop offset="0.5" stop-color="#d4caf2"/><stop offset="0.82" stop-color="#f3d3e2"/><stop offset="1" stop-color="#f9e2dc"/></linearGradient>
+<linearGradient id="fanSky" gradientUnits="userSpaceOnUse" x1="0" y1="206" x2="0" y2="440"><stop offset="0" stop-color="#b1b8ee"/><stop offset="0.55" stop-color="#dccbf1"/><stop offset="1" stop-color="#f6d6e0"/></linearGradient>
+<radialGradient id="wallG" gradientUnits="userSpaceOnUse" cx="800" cy="380" r="900"><stop offset="0" stop-color="#fffaf0"/><stop offset="0.55" stop-color="#f8f1ef"/><stop offset="1" stop-color="#ece2ee"/></radialGradient>
+<radialGradient id="ring1G" gradientUnits="userSpaceOnUse" cx="800" cy="290" r="330"><stop offset="0.7" stop-color="#fbf5ef"/><stop offset="1" stop-color="#e8dfee"/></radialGradient>
+<radialGradient id="ring2G" gradientUnits="userSpaceOnUse" cx="800" cy="290" r="300"><stop offset="0.7" stop-color="#fff8ec"/><stop offset="1" stop-color="#efe6ee"/></radialGradient>
+<linearGradient id="tileG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e4f5f0"/><stop offset="1" stop-color="#a6d5cc"/></linearGradient>
+<linearGradient id="stoneG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f1f7"/><stop offset="1" stop-color="#d9d2e4"/></linearGradient>
+<linearGradient id="rockG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f3eff8"/><stop offset="0.6" stop-color="#ddd5ea"/><stop offset="1" stop-color="#c3b8da"/></linearGradient>
+<radialGradient id="moonE" cx="0.42" cy="0.36" r="0.75"><stop offset="0" stop-color="#fffef8"/><stop offset="0.6" stop-color="#fdf5e0"/><stop offset="1" stop-color="#f4e2bd"/></radialGradient>
+<radialGradient id="moonLum" gradientUnits="userSpaceOnUse" cx="-34" cy="-46" r="150"><stop offset="0" stop-color="#fffef6" stop-opacity="0.55"/><stop offset="0.6" stop-color="#fffef6" stop-opacity="0.12"/><stop offset="1" stop-color="#fffef6" stop-opacity="0"/></radialGradient>
+<linearGradient id="pondG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d7d2f2"/><stop offset="0.5" stop-color="#e4d3ee"/><stop offset="1" stop-color="#f1d9e6"/></linearGradient>
+<linearGradient id="lotusG" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#fbe4ea"/><stop offset="1" stop-color="#f2a9bf"/></linearGradient>
+<linearGradient id="padG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9f1e3"/><stop offset="1" stop-color="#a9d7c2"/></linearGradient>
+<linearGradient id="hairL" gradientUnits="userSpaceOnUse" x1="0" y1="-400" x2="0" y2="10"><stop offset="0" stop-color="#fbebbb"/><stop offset="0.5" stop-color="#f0cd82"/><stop offset="1" stop-color="#dcab5c"/></linearGradient>
+<linearGradient id="hairD" gradientUnits="userSpaceOnUse" x1="0" y1="-300" x2="0" y2="10"><stop offset="0" stop-color="#ecc473"/><stop offset="1" stop-color="#cf9b4c"/></linearGradient>
+<linearGradient id="pinkL" gradientUnits="userSpaceOnUse" x1="0" y1="-340" x2="0" y2="-90"><stop offset="0" stop-color="#fde2ea"/><stop offset="1" stop-color="#eeaac0"/></linearGradient>
+<linearGradient id="pinkB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fde6ed"/><stop offset="1" stop-color="#f3b9ca"/></linearGradient>
+<linearGradient id="piboL4" gradientUnits="userSpaceOnUse" x1="-330" y1="0" x2="480" y2="0"><stop offset="0" stop-color="#cfc2f2" stop-opacity="0.92"/><stop offset="0.5" stop-color="#e5dcf8" stop-opacity="0.95"/><stop offset="1" stop-color="#c7e8e4" stop-opacity="0.95"/></linearGradient>
+<linearGradient id="piboM4" gradientUnits="userSpaceOnUse" x1="60" y1="0" x2="460" y2="0"><stop offset="0" stop-color="#fbd9d4" stop-opacity="0.95"/><stop offset="1" stop-color="#cfeee4" stop-opacity="0.92"/></linearGradient>
+<linearGradient id="bambooG" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#bfe2d4"/><stop offset="0.45" stop-color="#e6f6ee"/><stop offset="1" stop-color="#9fcdbb"/></linearGradient>
+  <!-- moving paper grain (seed re-rolled every pose) -->
+  <filter id="grainM" x="0" y="0" width="100%" height="100%">
+    <feTurbulence id="grainT" type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="3" stitchTiles="stitch"/>
+    <feColorMatrix type="matrix" values="0 0 0 0 0.36  0 0 0 0 0.28  0 0 0 0 0.46  1.4 0 0 0 -0.64"/>
+  </filter>
+  <radialGradient id="vigL" cx="0.5" cy="0.47" r="0.78"><stop offset="0.6" stop-color="#5a4a86" stop-opacity="0"/><stop offset="1" stop-color="#3e3170" stop-opacity="0.28"/></radialGradient>
+  <linearGradient id="capScrim" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fbf5f4" stop-opacity="0"/><stop offset="0.45" stop-color="#fbf5f4" stop-opacity="0.72"/><stop offset="1" stop-color="#fbf5f4" stop-opacity="0.86"/></linearGradient>
+  <linearGradient id="capScrimD" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2c2658" stop-opacity="0"/><stop offset="0.5" stop-color="#2c2658" stop-opacity="0.55"/><stop offset="1" stop-color="#2c2658" stop-opacity="0.7"/></linearGradient>
+</defs>
+<rect width="1600" height="900" fill="#f6f0f4"/>
+<g id="root"></g>
+<g id="measure" visibility="hidden"></g>
+</svg>
+<script>

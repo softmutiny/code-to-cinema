@@ -1,0 +1,11 @@
+frames/
+check/
+film.html
+timeline.json
+audio.wav
+*.mp4
+node_modules/
+tools/
+far-side/
+*.enc
+.env
